@@ -1,23 +1,35 @@
-const gridContainer = document.querySelector('.container');
-const gridButton = document.querySelector('#grid-button');
-const modeButton = document.querySelector('#mode-button');
+// Variables
 
-const DEFAULT_COLOR = '000000';
+const gridContainer = document.querySelector('.container');
+const gridSlider = document.querySelector('#grid-slider');
+const gridSliderValue = document.querySelector('#grid-size');
+const gridResetButton = document.querySelector('#reset-button');
+
+const modeButton = document.querySelector('#mode-button');
+const infiniteButton = document.querySelector('#infinite-ink');
+const refillButton = document.querySelector('#refill-ink');
+
+const colorPicker = document.querySelector('#color-picker');
+const colour = document.querySelector('#colour');
+
+const DEFAULT_COLOR = '0, 0, 0';
 const DEFAULT_MODE = 'normal';
 const DEFAULT_SIZE = 16;
 
+let infiniteInk = true;
+let colorCount = 100;
 
-let gridDivArr = [];
 let gridSize = DEFAULT_SIZE;
 
-let currentColor = DEFAULT_COLOR;
+let currentColor = `rgb(${DEFAULT_COLOR})`;
+colorPicker.style.backgroundColor = `rgb(${DEFAULT_COLOR})`;
 let currentMode = DEFAULT_MODE;
-
-gridSetup();
 
 let mouseDown = false;
 document.body.onmousedown = () => (mouseDown = true);
 document.body.onmouseup = () => (mouseDown = false);
+
+// Variables
 
 modeButton.addEventListener('click', function() {
     if(currentMode === 'normal') {
@@ -25,94 +37,106 @@ modeButton.addEventListener('click', function() {
         return currentMode = 'random';
     } else if(currentMode === 'random') {
         modeButton.textContent = 'Normal';
-        currentColor = DEFAULT_COLOR;
+        currentColor = `${colorPicker.style.backgroundColor}`;
         return currentMode = 'normal';
     }
-})
+});
 
-gridButton.addEventListener('click', function() {
-    gridSize = prompt('Please enter grid size(ex: 16 for 16x16): ', '16');
-    if(gridSize === '') {
-        return alert('You must insert a value!');
-    } else if(gridSize) {
-        while(isNaN(gridSize)) {
-            gridSize = prompt('Please enter grid size(only numbers): ', '16');
-            if(gridSize === '') {
-                return alert('You must insert a value!');
-            }
-        }
-        if(gridSize > 64) {
-            return alert("You can't set grid size over 64!");
-        }
-        return gridSetup();
-    }
-})
+colour.addEventListener('change', function() {
+    currentColor = `${this.value}`;
+    colorCount = 100;
+    return colorPicker.style.backgroundColor = `${this.value}`;
+});
 
-function gridSetup() {
-    if(gridContainer.innerHTML != '') {
-        gridContainer.innerHTML = '';
-    }
-    for(let i = 0; i < gridSize; i++) {
-        gridDivArr[i] = [];
-        for(let j = 0; j < gridSize; j++) {
-            const gridDiv = document.createElement('div');
-            gridDiv.style.width = `${gridContainer.clientWidth/gridSize}px`;
-            gridDiv.style.minHeight = `${gridContainer.clientHeight/gridSize}px`;
-            gridDiv.style.border = 'solid 1px black';
-            gridDivArr[i][j] = gridDiv;
-            gridDivArr[i][j].addEventListener('mouseover', function(e) {
-                if(e.button == 0) {
-                    hoverGrid(this, e);
-                }
-            });
-            gridDivArr[i][j].addEventListener('mousedown', function(e) {
-                if(e.button == 0) {
-                    hoverGrid(this, e);
-                }
-            });
-            gridContainer.appendChild(gridDiv);
-        }
-    }
+colorPicker.addEventListener('click', function() {
+    return colour.click();
+});
+
+gridSlider.addEventListener('input', function() {
+    gridSliderValue.textContent = `${this.value} X ${this.value}`;
+    gridSize = this.value;
+    return gridSetup(gridSize);
+});
+
+gridResetButton.addEventListener('click', function() {
+    gridSetup(gridSize);
+});
+
+infiniteButton.addEventListener('click', function() {
+    infiniteMode();
+});
+
+refillButton.addEventListener('click', function() {
+    if(!infiniteInk)
+        return colorCount = 100;
+});
+
+function gridReset() {
+    gridContainer.innerHTML = '';
 }
+
+function gridSetup(gridSize) {
+    gridReset();
+
+    gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, ${gridContainer.clientWidth/gridSize}px)`;
+    gridContainer.style.gridTemplateRows = `repeat(${gridSize}, ${gridContainer.clientHeight/gridSize}px)`;
+
+    colorCount = 100;
+
+    for(let i = 0; i < gridSize * gridSize; i++) {
+        const gridElement = document.createElement('div');
+        gridElement.classList.add('grid');
+        gridElement.addEventListener('mouseover', hoverGrid);
+        gridElement.addEventListener('mousedown', hoverGrid);
+        gridContainer.appendChild(gridElement);
+    }
+};
 
 function randomColor() {
     let randomColor = '';
-    let randomNumber = Math.floor(Math.random() * 16);
-    while(randomColor.length != 6) {
-        switch(randomNumber) {
-            case 10:
-                randomColor += 'A';
-                break;
-            case 11:
-                randomColor += 'B';
-                break;
-            case 12:
-                randomColor += 'C';
-                break;
-            case 13:
-                randomColor += 'D';
-                break;
-            case 14:
-                randomColor += 'E';
-                break;
-            case 15:
-                randomColor += 'F';
-                break;
-            default:
-                randomColor += randomNumber;
-                break;
-        }
-        randomNumber = Math.floor(Math.random() * 16);
-    }
-    return randomColor;
+
+    let r = Math.floor(Math.random() * 256);
+
+    let g = Math.floor(Math.random() * 256);
+
+    let b = Math.floor(Math.random() * 256);
+
+    return randomColor = `${r}, ${g}, ${b}`;
 }
 
-function hoverGrid(id, e) {
-    if(e.type === 'mouseover' && !mouseDown) return;
-    if(currentMode === 'normal') {
-        return id.style.backgroundColor = `#${currentColor}`;
-    } else if(currentMode === 'random') {
-        currentColor = randomColor();
-        return id.style.backgroundColor = `#${currentColor}`;
+function infiniteMode(e) {
+    if(infiniteInk) {
+        infiniteButton.textContent = 'Not Infinite';
+        refillButton.style.display = 'block';
+        infiniteInk = false;
+        colorCount = 100;
+    } else {
+        infiniteButton.textContent = 'Infinite';
+        refillButton.style.display = 'none';
+        infiniteInk = true;
     }
 }
+
+function hoverGrid(e) {
+    if(e.type === 'mouseover' && !mouseDown) return;
+    if(e.button !== 0) return;
+    if(currentMode === 'normal') {
+        if(infiniteInk) {
+            e.target.style.backgroundColor = `${currentColor}`;
+            e.target.style.filter = 'brightness(100%)';
+        } else {
+            e.target.style.backgroundColor = `${currentColor}`;
+            if(colorCount >= 10) {
+                e.target.style.filter = `brightness(${colorCount}%)`;
+                return colorCount -= 10;
+            }
+            e.target.style.filter = 'brightness(0%)';
+        }
+    } else if(currentMode === 'random') {
+        currentColor = randomColor();
+        e.target.style.filter = 'brightness(100%)';
+        return e.target.style.backgroundColor = `rgb(${currentColor})`;
+    }
+}
+
+gridSetup(gridSize);

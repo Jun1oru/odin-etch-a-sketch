@@ -5,12 +5,51 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="styles.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+        
         <script src="javascript.js" defer></script>
     </head>
     <body>
-        <button id="grid-button">Grid Size?</button>
-        <button id="mode-button">Normal</button>
-        <div class="container">
+        <div class="header">
+            <h1>Etch-a-Sketch</h1>
+        </div>
+        <div class="main">
+            <div class="left-side">
+                <span id="color-picker"></span>
+                <input type="color" value="#000000" id="colour"/>
+                <div>
+                    <label for="grid-slider">Grid size: <span id="grid-size">16 X 16</span></label>
+                    <input type="range" min="1" max="100" value="16" id="grid-slider" name="grid-slider"/>
+                </div>
+                <div class="settings-div">
+                    <span id="settings-color">
+                        <p>Color mode: </p>
+                        <button id="mode-button">Normal</button>
+                    </span>
+                    <span id="settings-ink">
+                        <p>Ink mode: </p>
+                        <button id="infinite-ink">Infinite</button>
+                        <button id="refill-ink">Refill</button>
+                    </span>
+                    <span id="settings-reset">
+                        <p>It's pretty much self-explanatory: </p>
+                        <button id="reset-button">Reset Grid</button>
+                    </span>
+                </div>
+            </div>
+            <div class="right-side">
+                <div class="container">
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Copyright &copy; 
+                <script>
+                    document.write(new Date().getFullYear());
+                </script>
+            </p>
         </div>
     </body>
 </html>
